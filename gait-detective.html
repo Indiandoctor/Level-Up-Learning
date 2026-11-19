@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gait Detective</title>
+<style>
+:root{
+  --bg:#0f1b2d; --panel:#172a45; --panel2:#1e3657; --ink:#eef3fb; --muted:#9fb3cf;
+  --gold:#f2b544; --green:#3ccf8e; --red:#ff6b6b; --blue:#5aa9ff; --line:#2c4a73;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:20px;line-height:1.45}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.brand h1{margin:0;font-size:2rem;letter-spacing:.5px}
+.brand small{display:block;color:var(--muted);font-size:.85rem}
+.badge{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.9rem;color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;margin-top:20px}
+.btn{background:var(--gold);color:#1b1300;border:0;border-radius:12px;padding:12px 22px;font-weight:700}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.blue{background:var(--blue);color:#06203f}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--muted)}
+.hidden{display:none!important}
+/* setup */
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
+.mode{background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:16px;text-align:left;color:var(--ink)}
+.mode.sel{border-color:var(--gold)}
+.mode b{display:block;font-size:1.1rem;margin-bottom:4px}
+.teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px}
+.teams input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0c1626;color:var(--ink);font:inherit}
+.rules li{margin:6px 0}
+/* game */
+.topbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.progress{height:10px;background:#0c1626;border-radius:999px;overflow:hidden;flex:1;min-width:200px}
+.progress>div{height:100%;background:var(--gold);width:0;transition:width .4s}
+.case-title{font-size:1.4rem;margin:0 0 4px}
+.clues{list-style:none;padding:0;margin:16px 0}
+.clue{display:flex;gap:14px;align-items:flex-start;background:var(--panel2);border-left:6px solid var(--blue);border-radius:10px;padding:12px 16px;margin:10px 0;animation:pop .35s ease}
+.clue .n{flex:0 0 auto;background:var(--blue);color:#06203f;font-weight:800;border-radius:50%;width:36px;height:36px;display:grid;place-items:center}
+.clue.locked{border-left-color:var(--line);color:var(--muted)}
+.clue.locked .n{background:var(--line);color:var(--muted)}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.worth{font-weight:700;color:var(--gold)}
+.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:10px}
+.opt{background:#0c1626;border:2px solid var(--line);color:var(--ink);border-radius:12px;padding:14px 16px;text-align:left}
+.opt:hover:not(:disabled){border-color:var(--gold)}
+.opt:disabled{opacity:.45;cursor:not-allowed}
+.opt.wrong{text-decoration:line-through}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.opt.right{border-color:var(--green);background:#0f3a2a;opacity:1;text-decoration:none}
+.verdict{margin-top:18px;border-radius:14px;padding:18px 20px}
+.verdict.good{background:#0f3a2a;border:1px solid var(--green)}
+.verdict.bad{background:#3a1717;border:1px solid var(--red)}
+.verdict h3{margin:0 0 8px}
+.teach dt{font-weight:700;color:var(--gold);margin-top:10px}
+.teach dd{margin:2px 0 0 0}
+.score{display:flex;gap:10px;flex-wrap:wrap}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:6px 14px}
+.chip.now{border-color:var(--gold);color:var(--gold);font-weight:700}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+html.big,html.big body{font-size:25px}
+.opt .l{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--panel2);color:var(--gold);font-weight:800;margin-right:10px}
+.steal{margin-top:14px;background:#3a2c0b;border:1px solid var(--gold);border-radius:12px;padding:12px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.timer{font-weight:800;font-variant-numeric:tabular-nums;background:#0c1626;border:1px solid var(--line);border-radius:10px;padding:6px 12px}
+.timer.out{background:var(--red);color:#2a0000;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.6}}
+select{font:inherit;padding:8px;border-radius:10px;background:#0c1626;color:var(--ink);border:1px solid var(--line)}
+footer{margin:28px 0 10px;color:var(--muted);font-size:.85rem;text-align:center}
+.foot svg{vertical-align:middle}
+@media (max-width:600px){html,body{font-size:18px}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="26" cy="26" r="16" fill="none" stroke="#f2b544" stroke-width="5"/>
+        <line x1="38" y1="38" x2="56" y2="56" stroke="#f2b544" stroke-width="7" stroke-linecap="round"/>
+        <ellipse cx="22" cy="30" rx="4" ry="6" fill="#5aa9ff"/><ellipse cx="31" cy="21" rx="4" ry="6" fill="#5aa9ff"/>
+      </svg>
+      <div><h1>Gait Detective</h1><small>Read the clues. Name the gait. Fewer clues, more points.</small></div>
+    </div>
+    <div class="row"><span class="badge" id="hdrInfo">Physiotherapy · Gait analysis</span><button class="btn ghost" id="bigBtn" title="Larger text for screen sharing">A+ Large text</button></div>
+  </header>
+
+  <!-- SETUP -->
+  <section id="setup" class="card">
+    <h2 style="margin-top:0">How do you want to play?</h2>
+    <div class="modes">
+      <button class="mode sel" data-mode="solo"><b>Solo / whole class</b><span class="muted">One score. Good for a projector, the class calls out the answer.</span></button>
+      <button class="mode" data-mode="teams"><b>Teams (2 to 5)</b><span class="muted">Teams take turns, one case each. Highest score wins.</span></button>
+    </div>
+    <div id="teamBox" class="hidden">
+      <div class="row"><label for="teamCount">Number of teams</label>
+        <select id="teamCount" style="font:inherit;padding:8px;border-radius:10px;background:#0c1626;color:var(--ink);border:1px solid var(--line)">
+          <option>2</option><option selected>3</option><option>4</option><option>5</option></select></div>
+      <div class="teams" id="teamNames"></div>
+    </div>
+    <div class="row" style="margin:6px 0 4px">
+      <label>Cases <select id="caseCount"><option value="4">4</option><option value="5">5</option><option value="10" selected>10</option></select></label>
+      <label>Clue timer <select id="timerSel"><option value="0">Off</option><option value="30">30 s</option><option value="45" selected>45 s</option><option value="60">60 s</option></select></label>
+    </div>
+    <ul class="rules">
+      <li>Each case has <b>5 clues</b>. Clue 1 is shown; reveal more when you need them.</li>
+      <li>Answer after clue 1 = <b>5 points</b>, after clue 2 = 4 … after clue 5 = 1.</li>
+      <li>A wrong answer costs <b>1 point</b> and opens the next clue.</li>
+      <li id="stealRule" class="hidden"><b>Steal:</b> if the team on turn answers wrong, the next team may steal at the current points. If the steal fails, play goes back to the team on turn.</li>
+      <li>Every case ends with a teaching card: the mechanism, what to look for, and the physiotherapy focus.</li>
+    </ul>
+    <div class="row"><button class="btn" id="startBtn">Start the investigation</button>
+      <span class="muted" id="bestLine"></span></div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" class="hidden">
+    <div class="card">
+      <div class="topbar">
+        <span class="muted" id="caseCounter">Case 1 of 10</span>
+        <div class="progress"><div id="bar"></div></div>
+      </div>
+      <div class="score" id="scoreRow" style="margin-top:14px"></div>
+    </div>
+    <div class="card">
+      <p class="muted" style="margin:0" id="turnLine"></p>
+      <h2 class="case-title" id="caseTitle"></h2>
+      <ul class="clues" id="clues"></ul>
+      <div class="row">
+        <button class="btn blue" id="moreBtn">Reveal next clue</button>
+        <span class="timer hidden" id="timer">45</span>
+        <span id="worthLine">This answer is worth <span class="worth" id="worth">5</span> points</span>
+      </div>
+      <h3 style="margin:22px 0 6px">Which gait is this?</h3>
+      <div class="options" id="options"></div>
+      <div class="steal hidden" id="stealBox"><span id="stealText"></span><button class="btn ghost" id="passBtn">No steal, back to the team on turn</button></div>
+      <div id="verdict" class="verdict hidden"></div>
+    </div>
+  </section>
+
+  <!-- END -->
+  <section id="end" class="card hidden">
+    <h2 style="margin-top:0">Case files closed</h2>
+    <div id="endBody"></div>
+    <div class="row" style="margin-top:18px">
+      <button class="btn" id="againBtn">Play again</button>
+    </div>
+  </section>
+
+  <footer class="foot">Gait Detective · Built with AI for "Level Up Learning", Dr. Harshal Sabané, 2026 ·
+    <span id="ver">Draft v0.2: clinical content awaiting expert review</span></footer>
+</div>
+
+<script>
+const CASES = [
+ {id:"trend", title:"The hip that gave way",
+  clues:[
+   "A 58-year-old woman, 3 months after a right total hip replacement through a lateral approach.",
+   "She walks slowly, and her body moves from side to side with each step.",
+   "When she stands on her right leg, the LEFT side of her pelvis drops.",
+   "To stop this, she leans her trunk over to the RIGHT each time she stands on the right leg.",
+   "Right hip abduction is grade 3- on manual muscle testing."],
+  answer:"Trendelenburg (gluteus medius) gait",
+  options:["Antalgic gait","Trendelenburg (gluteus medius) gait","Gluteus maximus gait","Circumduction (hemiplegic) gait","Short-leg gait"],
+  teach:{mech:"Weak right hip abductors (gluteus medius and minimus) cannot hold the pelvis level when the right leg is in stance, so the opposite side drops. A trunk lean towards the weak side (compensated Trendelenburg) moves the centre of mass over the hip and reduces the demand on the abductors.",
+   look:"Pelvic drop on the swing side during stance on the affected leg; lateral trunk lean towards the stance side. Positive Trendelenburg test on the right.",
+   physio:"Progressive hip abductor strengthening (side-lying abduction, clams, side-steps with band), single-leg balance work, and a stick in the LEFT hand to off-load the right abductors."}},
+ {id:"hemi", title:"The swinging arc",
+  clues:[
+   "A 64-year-old man, 6 weeks after a left middle cerebral artery stroke.",
+   "His right arm is held bent at the elbow, close to his body, with no arm swing.",
+   "During swing, his right leg travels in an outward semicircle instead of straight forward.",
+   "The right knee hardly bends in swing, and the right foot points down and turns in.",
+   "Modified Ashworth grade 2 in the right ankle plantarflexors."],
+  answer:"Circumduction (hemiplegic) gait",
+  options:["Scissoring gait","Circumduction (hemiplegic) gait","High-stepping (steppage) gait","Cerebellar ataxic gait","Trendelenburg (gluteus medius) gait"],
+  teach:{mech:"Upper motor neuron lesion: extensor synergy and spasticity in the leg (hip extension, knee extension, ankle plantarflexion and inversion) make the limb functionally longer, so it is swung outwards to clear the ground.",
+   look:"Outward arc of the affected leg in swing, stiff knee, equinovarus foot, flexed arm with reduced arm swing.",
+   physio:"Task-specific gait training, plantarflexor stretching and positioning, an ankle-foot orthosis, dorsiflexor activation or functional electrical stimulation, and balance and weight-shift training towards the affected side."}},
+ {id:"park", title:"The man who couldn't start",
+  clues:[
+   "A 70-year-old man with a 3-year history of a tremor in his right hand when it is at rest.",
+   "He takes short, shuffling steps, and his arms hardly swing.",
+   "He has trouble starting to walk and often 'freezes' in doorways.",
+   "Once moving, his steps get faster and shorter as his trunk leans forward, as if chasing his centre of gravity.",
+   "He turns 'en bloc', moving his whole body in several small steps."],
+  answer:"Parkinsonian (festinating) gait",
+  options:["Sensory ataxic gait","Cerebellar ataxic gait","Parkinsonian (festinating) gait","Antalgic gait","Waddling (myopathic) gait"],
+  teach:{mech:"Basal ganglia dysfunction causes bradykinesia, rigidity and hypokinesia: steps get smaller, automatic arm swing is lost, and the flexed posture pushes the centre of mass forward, so steps hurry to catch up (festination).",
+   look:"Short shuffling steps, reduced arm swing, start hesitation and freezing, festination, en bloc turning, flexed posture.",
+   physio:"External cues (lines on the floor, a metronome or music), large-amplitude training such as LSVT BIG, strategies for turning and getting through doorways, and falls prevention."}},
+ {id:"step", title:"The slapping foot",
+  clues:[
+   "A 32-year-old man, 6 weeks after a fracture of the neck of the left fibula, treated in a plaster cast.",
+   "You can HEAR him walking: his left foot slaps the floor.",
+   "In swing, he lifts his left hip and knee unusually high to clear his toes.",
+   "His left toes touch the ground before his heel.",
+   "Weak left ankle dorsiflexion and eversion, with numbness over the dorsum of the foot."],
+  answer:"High-stepping (steppage) gait",
+  options:["High-stepping (steppage) gait","Circumduction (hemiplegic) gait","Sensory ataxic gait","Short-leg gait","Gluteus maximus gait"],
+  teach:{mech:"Common peroneal (fibular) nerve injury at the fibular neck causes foot drop. Without dorsiflexion the toes catch in swing, so the hip and knee flex more to lift the foot clear.",
+   look:"Foot slap after heel contact (or toe-first contact), exaggerated hip and knee flexion in swing.",
+   physio:"Ankle-foot orthosis for safe walking, dorsiflexor strengthening or electrical stimulation as the nerve recovers, calf stretching to prevent contracture, and protecting the anaesthetic skin."}},
+ {id:"antal", title:"The quick step",
+  clues:[
+   "A 45-year-old woman, 3 days after twisting her left ankle playing badminton.",
+   "She walks with an uneven rhythm.",
+   "She spends as little time as possible standing on her left leg.",
+   "Her right step is short and quick, because she hurries off the left foot.",
+   "The left ankle is swollen and tender just in front of the lateral malleolus."],
+  answer:"Antalgic gait",
+  options:["Trendelenburg (gluteus medius) gait","Short-leg gait","Antalgic gait","High-stepping (steppage) gait","Parkinsonian (festinating) gait"],
+  teach:{mech:"Pain on weight-bearing makes the patient shorten the stance phase on the painful limb. The other leg therefore swings through quickly, giving a short step on the unaffected side.",
+   look:"Shortened stance time on the painful side, short quick step of the other leg, uneven rhythm.",
+   physio:"Protect and offload early (POLICE: protection, optimal loading, ice, compression, elevation), gradual return to full weight-bearing, range of motion, peroneal strengthening and balance (proprioceptive) training to prevent another sprain."}},
+ {id:"sens", title:"Lost in the dark",
+  clues:[
+   "A 60-year-old vegetarian man with type 2 diabetes who has taken metformin for 12 years.",
+   "He walks on a wide base and keeps looking down at his feet.",
+   "His heels land heavily, with a 'stamping' quality.",
+   "He is much worse in the dark; Romberg's test is positive.",
+   "Vibration and joint position sense are lost at both ankles and toes."],
+  answer:"Sensory ataxic gait",
+  options:["Cerebellar ataxic gait","Sensory ataxic gait","Parkinsonian (festinating) gait","Scissoring gait","Waddling (myopathic) gait"],
+  teach:{mech:"Loss of proprioception (dorsal columns or large-fibre peripheral nerves; here possibly vitamin B12 deficiency, which long-term metformin and a vegetarian diet both make more likely) means the patient relies on vision to know where the feet are.",
+   look:"Wide base, watching the feet, high stepping and stamping, worse with eyes closed or in the dark; positive Romberg.",
+   physio:"Balance training with progressive reduction of visual input, proprioceptive training, a walking aid, home safety and night lighting, and referral for medical review of the cause."}},
+ {id:"cereb", title:"The staggering walk",
+  clues:[
+   "A 50-year-old man with a long history of heavy alcohol use.",
+   "He walks on a wide base, with irregular step length and rhythm.",
+   "He staggers and veers, 'like someone who is drunk', even when sober.",
+   "He is just as unsteady with his eyes open; tandem walking is impossible.",
+   "Heel-shin test is abnormal on both sides."],
+  answer:"Cerebellar ataxic gait",
+  options:["Sensory ataxic gait","Cerebellar ataxic gait","Antalgic gait","Circumduction (hemiplegic) gait","High-stepping (steppage) gait"],
+  teach:{mech:"Cerebellar damage (alcohol especially affects the anterior vermis) disrupts the coordination and timing of movement. Vision cannot compensate, so the gait is unsteady with eyes open as well as closed.",
+   look:"Wide base, irregular steps, veering, inability to tandem walk; unsteadiness does not get markedly worse with eyes closed (contrast with sensory ataxia).",
+   physio:"Coordination and balance exercises (e.g. Frenkel-type and trunk stability work), gait training with a suitable walking aid, falls prevention, and support for alcohol cessation."}},
+ {id:"wadd", title:"The boy who climbed up himself",
+  clues:[
+   "A 6-year-old boy whose parents say he falls more often than other children.",
+   "He walks with his belly pushed forward and an increased lumbar curve.",
+   "His trunk sways from side to side with every step, like a duck.",
+   "To get up from the floor he 'climbs up' his own legs with his hands (Gowers' sign).",
+   "His calves look large and firm."],
+  answer:"Waddling (myopathic) gait",
+  options:["Waddling (myopathic) gait","Trendelenburg (gluteus medius) gait","Scissoring gait","Antalgic gait","Gluteus maximus gait"],
+  teach:{mech:"Proximal muscle weakness (here suggesting Duchenne muscular dystrophy) affects the hip abductors on BOTH sides, so the pelvis drops alternately and the trunk sways. Weak hip extensors cause an increased lumbar lordosis.",
+   look:"Bilateral side-to-side trunk sway, exaggerated lumbar lordosis, toe walking, Gowers' sign, calf pseudohypertrophy.",
+   physio:"Daily stretching to prevent contractures (especially the calves), night splints, keeping the child active but avoiding exhausting and heavy eccentric exercise, and respiratory care as the disease progresses."}},
+ {id:"sciss", title:"Crossing paths",
+  clues:[
+   "A 7-year-old girl born at 30 weeks' gestation.",
+   "She walks on her toes with her knees slightly bent.",
+   "Her thighs come together, and her knees cross in front of each other as she steps.",
+   "Her hips are held adducted and internally rotated.",
+   "Both legs show spasticity, more than the arms; she has good hand function."],
+  answer:"Scissoring gait",
+  options:["Circumduction (hemiplegic) gait","Scissoring gait","Waddling (myopathic) gait","Cerebellar ataxic gait","Parkinsonian (festinating) gait"],
+  teach:{mech:"Spastic diplegic cerebral palsy (common after preterm birth) causes spasticity of the hip adductors and internal rotators, so the legs cross in front of each other in swing.",
+   look:"Knees crossing in swing, narrow base, toe walking, flexed knees.",
+   physio:"Adductor and hamstring stretching, positioning, orthoses (e.g. ankle-foot orthoses), strengthening, gait training, and therapy after botulinum toxin injections or orthopaedic surgery."}},
+ {id:"quad", title:"The helping hand",
+  clues:[
+   "A 52-year-old man who had polio as a child.",
+   "His left leg is thinner than his right.",
+   "During stance on the left, he presses his left thigh with his left hand.",
+   "His left knee snaps back into hyperextension when he puts weight on it.",
+   "Left knee extensors are grade 2 on manual muscle testing."],
+  answer:"Quadriceps (hand-to-knee) gait",
+  options:["Quadriceps (hand-to-knee) gait","Gluteus maximus gait","Antalgic gait","High-stepping (steppage) gait","Short-leg gait"],
+  teach:{mech:"Weak quadriceps cannot control knee flexion at loading. The patient locks the knee in hyperextension (or pushes on the thigh with the hand) so that the ground reaction force passes in front of the knee and keeps it straight.",
+   look:"Hand pushing on the front of the thigh in early stance, knee hyperextension (genu recurvatum), forward trunk lean.",
+   physio:"A knee-ankle-foot orthosis or stance-control orthosis to stabilise the knee and protect the posterior capsule, strengthening of the remaining muscles without exhausting them, and energy conservation."}}
+];
+
+const $ = s => document.querySelector(s);
+let mode="solo", players=[], order=[], idx=0, revealed=1, wrongs=0, done=false, results=[], active=0, tLeft=0, tId=null, tLen=45;
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function getBest(){try{return JSON.parse(localStorage.getItem("gaitDetectiveBest")||"null");}catch(e){return null;}}
+function setBest(v){try{localStorage.setItem("gaitDetectiveBest",JSON.stringify(v));}catch(e){}}
+
+function renderTeamInputs(){
+  const n=+$("#teamCount").value, box=$("#teamNames"), old=[...box.querySelectorAll("input")].map(i=>i.value);
+  box.innerHTML="";
+  for(let i=0;i<n;i++){const inp=document.createElement("input");inp.value=old[i]||("Team "+(i+1));inp.setAttribute("aria-label","Name of team "+(i+1));box.appendChild(inp);}
+}
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".mode").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");mode=b.dataset.mode;
+  $("#teamBox").classList.toggle("hidden",mode!=="teams");$("#stealRule").classList.toggle("hidden",mode!=="teams");if(mode==="teams"){renderTeamInputs();$("#caseCount").value=$("#teamCount").value==="5"?"5":"4";}else{$("#caseCount").value="10";}});
+$("#teamCount").onchange=()=>{renderTeamInputs();const n=+$("#teamCount").value;$("#caseCount").value=n>=5?"5":(n===2?"4":"4");};
+$("#bigBtn").onclick=()=>{document.documentElement.classList.toggle("big");try{localStorage.setItem("gdBig",document.documentElement.classList.contains("big")?"1":"0");}catch(e){}};
+try{if(localStorage.getItem("gdBig")==="1")document.documentElement.classList.add("big");}catch(e){}
+
+function showBest(){const b=getBest();$("#bestLine").textContent=b?`Best solo score (10 cases) on this device: ${b.score} / ${CASES.length*5}`:"";}
+
+$("#startBtn").onclick=()=>{
+  players = mode==="teams" ? [...$("#teamNames").querySelectorAll("input")].map((i,k)=>({name:i.value.trim()||("Team "+(k+1)),score:0}))
+                           : [{name:"Score",score:0}];
+  order=shuffle(CASES).slice(0,+$("#caseCount").value); idx=0; results=[]; tLen=+$("#timerSel").value;
+  $("#setup").classList.add("hidden");$("#end").classList.add("hidden");$("#game").classList.remove("hidden");
+  loadCase();
+};
+$("#againBtn").onclick=()=>{$("#end").classList.add("hidden");$("#setup").classList.remove("hidden");showBest();};
+
+function current(){return players[idx%players.length];}
+function renderScores(){
+  $("#scoreRow").innerHTML=players.map((p,k)=>`<span class="chip ${players.length>1&&k===active&&!done?'now':''}">${esc(p.name)}: <b>${p.score}</b></span>`).join("");
+}
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+function loadCase(){
+  const c=order[idx]; revealed=1; wrongs=0; done=false; active=idx%players.length; $("#stealBox").classList.add("hidden");
+  $("#caseCounter").textContent=`Case ${idx+1} of ${order.length}`;
+  $("#bar").style.width=(idx/order.length*100)+"%";
+  $("#turnLine").textContent=players.length>1?`${current().name}, this case is yours`:"";
+  $("#caseTitle").textContent=`Case file: ${c.title}`;
+  $("#verdict").classList.add("hidden");
+  $("#moreBtn").disabled=false;
+  $("#options").innerHTML="";
+  shuffle(c.options).forEach((o,i)=>{const b=document.createElement("button");b.className="opt";b.dataset.ans=o;b.innerHTML=`<span class="l">${"ABCDE"[i]}</span>${esc(o)}`;b.onclick=()=>guess(b,o);$("#options").appendChild(b);});
+  $("#worthLine").innerHTML='This answer is worth <span class="worth" id="worth">5</span> points';
+  renderClues();renderScores();
+}
+function worth(){return Math.max(0,6-revealed-wrongs);}
+function renderClues(){
+  const c=order[idx];
+  const left=c.clues.length-revealed;
+  $("#clues").innerHTML=c.clues.slice(0,revealed).map((t,i)=>`<li class="clue"><span class="n">${i+1}</span><span>${esc(t)}</span></li>`).join("")
+     + (left>0?`<li class="clue locked"><span class="n">${revealed+1}</span><span>${left===1?"1 clue":left+" clues"} still locked</span></li>`:"");
+  $("#worth").textContent=worth();
+  $("#moreBtn").disabled = done || revealed>=c.clues.length || active!==idx%players.length;
+  startTimer();
+}
+function startTimer(){
+  clearInterval(tId);const t=$("#timer");
+  if(!tLen||done){t.classList.add("hidden");return;}
+  tLeft=tLen;t.classList.remove("hidden","out");t.textContent=tLeft+" s";
+  tId=setInterval(()=>{tLeft--;if(tLeft<=0){clearInterval(tId);t.textContent="Time!";t.classList.add("out");}else t.textContent=tLeft+" s";},1000);
+}
+$("#moreBtn").onclick=()=>{if(revealed<order[idx].clues.length){revealed++;renderClues();}};
+
+function guess(btn,o){
+  if(done)return;const c=order[idx];
+  if(o===c.answer){const pts=worth();players[active].score+=pts;finish(true,pts);btn.classList.add("right");}
+  else{
+    btn.disabled=true;btn.classList.add('wrong');wrongs++;
+    if(revealed<c.clues.length)revealed++;
+    renderClues();
+    if(worth()<=0){finish(false,0);return;}
+    if(players.length>1){
+      const turn=idx%players.length;
+      if(active===turn){active=(turn+1)%players.length;showSteal(true);}
+      else{active=turn;showSteal(false);}
+      $("#moreBtn").disabled = active!==turn || revealed>=c.clues.length;
+      renderScores();
+    }
+  }
+}
+function showSteal(on){
+  const box=$("#stealBox");
+  if(on){$("#stealText").innerHTML=`<b>${esc(players[active].name)}</b> may steal for <b>${worth()}</b> points!`;box.classList.remove("hidden");}
+  else{box.classList.add("hidden");$("#turnLine").textContent=`Steal failed. Back to ${players[active].name}`;}
+}
+$("#passBtn").onclick=()=>{active=idx%players.length;$("#stealBox").classList.add("hidden");$("#turnLine").textContent=`No steal. Back to ${players[active].name}`;$("#moreBtn").disabled=revealed>=order[idx].clues.length;renderScores();};
+function finish(ok,pts){
+  done=true;const c=order[idx];clearInterval(tId);$("#timer").classList.add("hidden");$("#stealBox").classList.add("hidden");
+  results.push({title:c.title,answer:c.answer,clues:revealed,pts,ok,who:ok?players[active].name:"-"});
+  document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;if(b.dataset.ans===c.answer){b.classList.add("right");}});
+  $("#moreBtn").disabled=true;
+  renderCluesAll();
+  const v=$("#verdict");v.className="verdict "+(ok?"good":"bad");
+  const last=idx===order.length-1;
+  v.innerHTML=`<h3>${ok?`Case solved: +${pts} point${pts===1?"":"s"}`:"Case closed: no points this time"}</h3>
+   <p style="margin:0">The answer is <b>${esc(c.answer)}</b>.</p>
+   <dl class="teach">
+    <dt>Why it happens</dt><dd>${esc(c.teach.mech)}</dd>
+    <dt>What to look for</dt><dd>${esc(c.teach.look)}</dd>
+    <dt>Physiotherapy focus</dt><dd>${esc(c.teach.physio)}</dd>
+   </dl>
+   <div class="row" style="margin-top:14px"><button class="btn" id="nextBtn">${last?"See final scores":"Next case"}</button></div>`;
+  v.classList.remove("hidden");renderScores();
+  $("#nextBtn").onclick=()=>{idx++; if(idx<order.length)loadCase(); else endGame();};
+  $("#nextBtn").focus();
+}
+function renderCluesAll(){
+  const c=order[idx];
+  $("#clues").innerHTML=c.clues.map((t,i)=>`<li class="clue"><span class="n">${i+1}</span><span>${esc(t)}</span></li>`).join("");
+  $("#worthLine").textContent="All clues shown for review";
+}
+function endGame(){
+  $("#game").classList.add("hidden");$("#end").classList.remove("hidden");$("#bar").style.width="100%";
+  const max=order.length*5;
+  let html="";
+  if(players.length>1){
+    const ranked=players.slice().sort((a,b)=>b.score-a.score);
+    html+=`<p style="font-size:1.3rem">Winner: <b style="color:var(--gold)">${esc(ranked[0].name)}</b> with ${ranked[0].score} points</p>`;
+    html+=`<table><tr><th>Team</th><th>Score</th></tr>${ranked.map(p=>`<tr><td>${esc(p.name)}</td><td>${p.score}</td></tr>`).join("")}</table>`;
+  } else {
+    const s=players[0].score, b=getBest();
+    html+=`<p style="font-size:1.3rem">Your score: <b style="color:var(--gold)">${s}</b> out of ${max}</p>`;
+    if(order.length===CASES.length&&(!b||s>b.score)){setBest({score:s});html+=`<p class="muted">New best score on this device.</p>`;}
+  }
+  html+=`<h3>Case review</h3><table><tr><th>Case</th><th>Gait</th>${players.length>1?"<th>Scored by</th>":""}<th>Clues used</th><th>Points</th></tr>`+
+    results.map(r=>`<tr><td>${esc(r.title)}</td><td>${esc(r.answer)}</td>${players.length>1?`<td>${esc(r.who)}</td>`:""}<td>${r.clues}</td><td>${r.pts}</td></tr>`).join("")+`</table>`;
+  const missed=results.filter(r=>!r.ok||r.pts<=2);
+  if(missed.length) html+=`<p class="muted" style="margin-top:14px">Worth revising: ${missed.map(r=>esc(r.answer)).join(", ")}.</p>`;
+  $("#endBody").innerHTML=html;
+}
+showBest();
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Level Up Learning: toolkit</title>
+<style>
+:root{--bg:#0f1b2d;--panel:#172a45;--ink:#eef3fb;--muted:#a9bad1;--gold:#f2b544;--line:#2c4a73}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:18px;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:28px 20px 40px}
+h1{font-size:2.2rem;margin:0 0 4px}
+.sub{color:var(--gold);font-size:1.15rem;margin:0 0 6px}
+.by{color:var(--muted);margin:0 0 26px}
+h2{font-size:1.3rem;margin:30px 0 10px;color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+a.card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;color:var(--ink);text-decoration:none}
+a.card:hover{border-color:var(--gold)}
+a.card b{display:block;font-size:1.1rem;margin-bottom:4px}
+a.card span{color:var(--muted)}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 20px;margin-top:26px;color:var(--muted)}
+.note b{color:var(--ink)}
+footer{margin-top:30px;color:var(--muted);font-size:.95rem}
+a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Level Up Learning</h1>
+  <p class="sub">Building AI-assisted educational games for physiotherapy students</p>
+  <p class="by">Dr. Harshal Sabané · Datta Meghe College of Physiotherapy, Nagpur · 26 November 2026</p>
+
+  <h2>Play the games</h2>
+  <div class="grid">
+    <a class="card" href="gait-detective.html"><b>Gait Detective</b><span>10 gait cases, clue by clue. Solo or 2–5 teams with a steal.</span></a>
+    <a class="card" href="special-test-showdown.html"><b>Special Test Showdown</b><span>12 musculoskeletal special tests against the clock. No leaderboard.</span></a>
+    <a class="card" href="https://indiandoctor.github.io/French-Quest/"><b>French Quest</b><span>A whole school syllabus as a game journey (children's French).</span></a>
+  </div>
+
+  <h2>Build your own</h2>
+  <div class="grid">
+    <a class="card" href="prompt-cookbook.pdf"><b>Prompt cookbook (PDF)</b><span>Master template, five physiotherapy game recipes, tutor-mode prompts.</span></a>
+    <a class="card" href="level-recipe-card.pdf"><b>LEVEL recipe card (PDF)</b><span>The five steps, and a checklist for verifying AI content.</span></a>
+    <a class="card" href="prompt-1-build-special-test-showdown.txt"><b>Prompt used live: build the game</b><span>Copy, change the content, and build your own.</span></a>
+    <a class="card" href="prompt-2-add-practice-mode.txt"><b>Prompt used live: improve it</b><span>A one-sentence improvement: add a practice mode.</span></a>
+  </div>
+
+  <div class="note"><b>Before your students play any AI-made game:</b> give the AI the content yourself, ask it to list what it is unsure about, and have a subject expert check every fact. Never enter patient details into an AI tool.</div>
+
+  <footer>Free to use and adapt for teaching. Please keep the "check every fact" step. Contact: harshalsabane@gmail.com</footer>
+</div>
+</body>
+</html>

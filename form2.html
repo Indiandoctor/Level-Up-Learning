@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Level Up Learning: feedback form</title>
+<script>
+  // Put the Google Form 2 link between the quotes. Leave empty until the form exists.
+  var FORM2_URL = "";
+  if (FORM2_URL) { window.location.replace(FORM2_URL); }
+</script>
+<style>
+body{margin:0;background:#0f1b2d;color:#eef3fb;font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:20px;line-height:1.5;display:grid;place-items:center;min-height:100vh;text-align:center;padding:20px}
+a{color:#f2b544}
+</style>
+</head>
+<body>
+  <div>
+    <h1>Level Up Learning</h1>
+    <p id="msg">The feedback form will open here during the session. Please use the link shared in the Zoom chat.</p>
+    <p><a href="index.html">Go to the toolkit</a></p>
+  </div>
+  <script>if (FORM2_URL) document.getElementById('msg').innerHTML = 'Opening the form… If nothing happens, <a href="' + FORM2_URL + '">tap here</a>.';</script>
+</body>
+</html>

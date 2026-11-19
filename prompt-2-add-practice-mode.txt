@@ -1,0 +1,1 @@
+Add a "Practice mode" button on the start screen. In practice mode there is no timer and no score; after each answer, show the positive finding for ALL four options, so students learn from the wrong answers too.

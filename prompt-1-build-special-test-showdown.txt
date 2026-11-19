@@ -1,0 +1,37 @@
+Build me an educational game as ONE self-contained HTML file (all HTML, CSS and JavaScript in one file, no external libraries, fonts or images, works offline in any browser).
+
+WHO IT IS FOR
+Second-year physiotherapy students revising musculoskeletal special tests.
+
+LEARNING OBJECTIVE
+Students can match each special test to the structure or condition it tests, and recall what a positive result looks like.
+
+CONTENT: use ONLY these 12 tests and facts. Do not add, change or "improve" any clinical fact.
+1. Lachman test | Anterior cruciate ligament (ACL) | Increased forward glide of the tibia with a soft end-feel, knee in 20-30 degrees of flexion
+2. Posterior drawer test | Posterior cruciate ligament (PCL) | Backward glide or sag of the tibia, knee at 90 degrees of flexion
+3. McMurray test | Meniscus | Painful click or clunk as the knee is rotated and extended from full flexion
+4. Empty can (Jobe) test | Supraspinatus | Pain or weakness resisting downward pressure, arm in the scapular plane with the thumb down
+5. Speed's test | Long head of biceps tendon | Pain in the bicipital groove on resisted shoulder flexion, elbow straight and forearm supinated
+6. Apprehension test | Anterior shoulder instability | Patient fears dislocation with the arm abducted to 90 degrees and externally rotated
+7. Phalen's test | Median nerve at the carpal tunnel | Tingling or numbness in the median nerve area within 60 seconds of holding the wrist flexed
+8. Finkelstein test | De Quervain's tenosynovitis (APL and EPB) | Pain over the radial styloid when the thumb is held in the fist and the wrist is bent towards the little finger
+9. Thomas test | Hip flexor tightness | The thigh of the straight leg lifts off the couch when the other hip is fully flexed
+10. Thompson test | Achilles tendon rupture | No plantarflexion of the foot when the calf is squeezed, patient prone
+11. Spurling's test | Cervical nerve root (radiculopathy) | Arm pain reproduced by neck extension, side-bending to the painful side and downward pressure on the head
+12. Straight leg raise | Lumbosacral nerve root (sciatica) | Leg pain below the knee between about 30 and 70 degrees of hip raise
+
+HOW THE GAME WORKS
+- Name: "Special Test Showdown". One player or the whole class on a projector.
+- 12 questions, one per test, in random order, each with 4 answer buttons.
+- Mix two question types at random: "What does the ___ check?" and "Which test would you use for ___?". Wrong options come from the other tests in the list.
+- 15-second countdown per question.
+- Scoring: 100 points for a correct answer plus 5 points for every second left. From the third correct answer in a row, add a 50-point streak bonus.
+- After every answer, show right or wrong and one line: "Positive test: [the positive finding]". Then a Next button.
+- Keys 1-4 can be used to answer, and Enter for Next.
+- End screen: total score, number correct out of 12, the player's personal best on this device, and a list of the tests they got wrong with the correct answers to revise.
+- No leaderboard and no comparison with other players: the game rewards improving on your own best.
+
+LOOK AND FEEL
+Clean, modern and readable on a projector: dark background, large text (at least 20 px), big buttons, green for correct and red for wrong, a visible timer bar, and a short title screen with the rules and a Start button.
+
+At the end, list anything you were unsure about so a teacher can check it.
